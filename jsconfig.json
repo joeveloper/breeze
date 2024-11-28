@@ -1,7 +1,23 @@
+// {
+//   "compilerOptions": {
+    // "paths": {
+    //   "@/*": ["./*"]
+    // }
+//   }
+// }
+
+
 {
   "compilerOptions": {
     "paths": {
       "@/*": ["./*"]
-    }
-  }
+    },
+    "jsx": "react-jsx", // For React 17+ and TypeScript 4.1+
+    "moduleResolution": "node", // Ensures module resolution works correctly
+    "esModuleInterop": true,    // Enables compatibility with CommonJS modules
+    "skipLibCheck": true,       // Optional: Skip type checking of declaration files
+    "strict": true              // Optional: Enable strict type checking
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }
