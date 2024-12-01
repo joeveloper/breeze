@@ -6,21 +6,35 @@ import CircularProgress from "@/components/elements/CircularProgress";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import PerfectScrollbar from "react-perfect-scrollbar";
+
 export default function Home() {
-
-    const [user, setUser] = useState(null);
-
-  const getCurrentUser = useCallback(async () => {
-    const user = localStorage.getItem("currentUser");
-    setUser(JSON.parse(user));
-  }, []);
+  const [user, setUser] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
-    getCurrentUser();
-    console.log("user:", user && user?.firstName);
-  }, []);
+    const token = localStorage.getItem("accessToken");
 
+    if (!token) {
+      // Redirect to the signin page if token is missing
+      router.push("/signin");
+    } else {
+      // Get current user after verifying authentication
+      getCurrentUser();
+    }
+  }, []); // Run once on mount
+
+  const getCurrentUser = useCallback(() => {
+    const user = localStorage.getItem("currentUser");
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      setUser(parsedUser);
+      console.log("User:", parsedUser.firstName); // Log user's first name
+    } else {
+      console.log("No current user found.");
+    }
+  }, []);
 
   return (
     <>
@@ -29,52 +43,52 @@ export default function Home() {
           <div className="col-xl-3 col-lg-6 col-md-6 col-sm-6">
             <div className="stat-widget-1">
               <h6>Total Balance</h6>
-              <h3>$ 432568</h3>
+              <h3>₦ 432568</h3>
               <p>
                 <span className="text-success">
                   <i className="fi fi-rr-arrow-trend-up" />
                   2.47%
                 </span>
-                Last month <strong>$24,478</strong>
+                Last month <strong>₦24,478</strong>
               </p>
             </div>
           </div>
           <div className="col-xl-3 col-lg-6 col-md-6 col-sm-6">
             <div className="stat-widget-1">
               <h6>Total Period Change</h6>
-              <h3>$ 245860</h3>
+              <h3>₦ 245860</h3>
               <p>
                 <span className="text-success">
                   <i className="fi fi-rr-arrow-trend-up" />
                   2.47%
                 </span>
-                Last month <strong>$24,478</strong>
+                Last month <strong>₦24,478</strong>
               </p>
             </div>
           </div>
           <div className="col-xl-3 col-lg-6 col-md-6 col-sm-6">
             <div className="stat-widget-1">
               <h6>Total Period Expenses</h6>
-              <h3>$ 25.35</h3>
+              <h3>₦ 25.35</h3>
               <p>
                 <span className="text-danger">
                   <i className="fi fi-rr-arrow-trend-down" />
                   2.47%
                 </span>
-                Last month <strong>$24,478</strong>
+                Last month <strong>₦24,478</strong>
               </p>
             </div>
           </div>
           <div className="col-xl-3 col-lg-6 col-md-6 col-sm-6">
             <div className="stat-widget-1">
               <h6>Total Period Income</h6>
-              <h3>$ 22.56</h3>
+              <h3>₦ 22.56</h3>
               <p>
                 <span className="text-success">
                   <i className="fi fi-rr-arrow-trend-up" />
                   2.47%
                 </span>
-                Last month <strong>$24,478</strong>
+                Last month <strong>₦24,478</strong>
               </p>
             </div>
           </div>
@@ -84,7 +98,7 @@ export default function Home() {
             <div className="card">
               <div className="card-header balance-trend">
                 <h4 className="card-title">
-                  Balace Trends <br /> <span>$221,478</span>
+                  Balace Trends <br /> <span>₦221,478</span>
                 </h4>
                 <div className="trend-stats">
                   <p className="mb-0">Last Month</p>
@@ -136,7 +150,7 @@ export default function Home() {
                         Food
                       </p>
                       <h5 className="mb-0">
-                        <span>$1200</span>38%
+                        <span>₦1200</span>38%
                       </h5>
                     </li>
                     <li>
@@ -145,7 +159,7 @@ export default function Home() {
                         Transport
                       </p>
                       <h5 className="mb-0">
-                        <span>$1200</span>38%
+                        <span>₦1200</span>38%
                       </h5>
                     </li>
                     <li>
@@ -154,7 +168,7 @@ export default function Home() {
                         Healthcare
                       </p>
                       <h5 className="mb-0">
-                        <span>$1200</span>38%
+                        <span>₦1200</span>38%
                       </h5>
                     </li>
                     <li>
@@ -163,7 +177,7 @@ export default function Home() {
                         Education
                       </p>
                       <h5 className="mb-0">
-                        <span>$1200</span>38%
+                        <span>₦1200</span>38%
                       </h5>
                     </li>
                     <li>
@@ -172,7 +186,7 @@ export default function Home() {
                         Clothes
                       </p>
                       <h5 className="mb-0">
-                        <span>$1200</span>38%
+                        <span>₦1200</span>38%
                       </h5>
                     </li>
                     <li>
@@ -181,7 +195,7 @@ export default function Home() {
                         Pets
                       </p>
                       <h5 className="mb-0">
-                        <span>$1200</span>38%
+                        <span>₦1200</span>38%
                       </h5>
                     </li>
                     <li>
@@ -190,7 +204,7 @@ export default function Home() {
                         Entertainment
                       </p>
                       <h5 className="mb-0">
-                        <span>$1200</span>38%
+                        <span>₦1200</span>38%
                       </h5>
                     </li>
                   </ul>

@@ -16,7 +16,7 @@ export default function Locked() {
                                                 <Link href="/index">
                                                     <img src="/images/logo-white.png" alt="" width={30} /></Link>
                                             </div>
-                                            <h3>Welcome to Ekash</h3>
+                                            <h3>Welcome to Aermint</h3>
                                         </div>
                                         <div className="privacy-social">
                                             <div className="privacy-link"><Link href="#">Have an issue with 2-factor

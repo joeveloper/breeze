@@ -9,7 +9,7 @@ export default function Footer1() {
                         <div className="col-xl-6">
                             <div className="copyright">
                                 <p>© Copyright
-                                    <Link href="#">Ekash</Link> I All Rights Reserved
+                                    <Link href="#">Aermint</Link> I All Rights Reserved
                                 </p>
                             </div>
                         </div>

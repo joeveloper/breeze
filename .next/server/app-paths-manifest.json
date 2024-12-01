@@ -1,4 +1,8 @@
 {
-  "/profile/page": "app/profile/page.js",
-  "/page": "app/page.js"
+  "/add-bank/page": "app/add-bank/page.js",
+  "/finalize-payment/page": "app/finalize-payment/page.js",
+  "/settings-general/page": "app/settings-general/page.js",
+  "/wallets/page": "app/wallets/page.js",
+  "/budgets/page": "app/budgets/page.js",
+  "/not-found": "app/not-found.js"
 }

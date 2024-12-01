@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSignUp } from "@/contexts/SignUpContext";
 import { useSearchParams } from "next/navigation";
+import ToastDisplay from "../../components/elements/ToastDisplay";
 
 
 export default function OtpCode() {
   const [verificationCode, setVerificationCode] = useState("");
+  const [error, setError] = useState(null);
   const baseUrl = "https://aermint.onrender.com/api/v1"
   const router = useRouter();
   // const { formData,  handleSignUp, error, isLoading } =
@@ -59,7 +61,7 @@ export default function OtpCode() {
     //   setAuth(true, data.data);
     //   alert(`Signup successful: Welcome, ${data.firstName}!`);
     } catch (err) {
-      setError(err.message);
+      console.error("Signup error:", err.message);
     } finally {
       // setIsLoading(false);
       console.log('otp successful')

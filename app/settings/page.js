@@ -21,7 +21,7 @@ export default function Settings() {
                                                     <h4>Welcome, Hafsa Humaira!</h4>
                                                     <p>Looks like you are not verified yet. Verify yourself to use the full
                                                         potential of
-                                                        Ekash.</p>
+                                                        Aermint.</p>
                                                 </div>
                                             </div>
                                             <ul>

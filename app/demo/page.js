@@ -55,7 +55,7 @@ export default function Demo() {
                         <div className="row align-items-center justify-content-between">
                             <div className="col-xl-6 col-md-6 my-5">
                                 <div className="demo-intro-content">
-                                    <h1>Ekash - Personal Finance Management Admin Dashboard Nextjs Template</h1>
+                                    <h1>Aermint - Personal Finance Management Admin Dashboard Nextjs Template</h1>
                                     <p>Personal Finance Management refers to the process of managing an individual's or a
                                         household's financial resources with the goal of achieving financial stability and meeting
                                         both short-term and long-term financial objectives. </p>
@@ -558,7 +558,7 @@ export default function Demo() {
                             <div className="col-xl-7">
                                 <div className="section-title text-center">
                                     <span>Widgets</span>
-                                    <h2>Accelerate Your Development and Launch Rapidly with Ekash</h2>
+                                    <h2>Accelerate Your Development and Launch Rapidly with Aermint</h2>
                                 </div>
                             </div>
                         </div>
@@ -726,7 +726,7 @@ export default function Demo() {
                                 <div className="features-content">
                                     <i className="fi fi-rr-settings-sliders" />
                                     <h5>150+ UI Components</h5>
-                                    <p>Almost 150+ UI Components being given with Ekash Admin Pack.</p>
+                                    <p>Almost 150+ UI Components being given with Aermint Admin Pack.</p>
                                 </div>
                             </div>
                             <div className="col-sm-6 col-md-4 col-lg-3">
@@ -748,7 +748,7 @@ export default function Demo() {
                                 <div className="features-content">
                                     <i className="fi fi-rr-laptop-mobile" />
                                     <h5>Fully Responsive</h5>
-                                    <p>All the layout of Ekash Admin is Fully Responsive and widely
+                                    <p>All the layout of Aermint Admin is Fully Responsive and widely
                                         tested.
                                     </p>
                                 </div>
@@ -1052,7 +1052,7 @@ export default function Demo() {
                             <div className="col-xl-6">
                                 <div className="copyright">
                                     <p>© Copyright
-                                        <Link href="#">Ekash</Link> I All Rights Reserved
+                                        <Link href="#">Aermint</Link> I All Rights Reserved
                                     </p>
                                 </div>
                             </div>

@@ -107,10 +107,10 @@ const SignUpForm = () => {
                 National Identification Number
               </label>
               <input
-                name="nationalIdentificationNumber"
+                name="nationalIdentificationNo"
                 type="text"
                 className="form-control"
-                value={formData?.nationalIdentificationNumber}
+                value={formData?.nationalIdentificationNo}
                 onChange={handleInputChange}
               />
             </div>

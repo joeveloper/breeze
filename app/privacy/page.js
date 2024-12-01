@@ -14,17 +14,17 @@ export default function Privacy() {
                             </div>
                             <div className="card-body">
                                 <div className="privacy-content">
-                                    <p>Ekash is an instant personal finance management that allows you to exchange cash
+                                    <p>Aermint is an instant personal finance management that allows you to exchange cash
                                         fast and buy it with a bank card. The service provides the best cash-to-cash
                                         rates and supports over 140 currencies available for exchange
                                     </p>
                                 </div>
                                 <div className="privacy-content">
-                                    <h5>How does Ekash work? </h5>
+                                    <h5>How does Aermint work? </h5>
                                     <p>
-                                        Ekash trading algorithm is integrated into the largest personal finance management
+                                        Aermint trading algorithm is integrated into the largest personal finance management
                                         platforms, including Binance, Poloniex, Bittrex, etc. In the span of milliseconds,
-                                        Ekash makes bids and asks on the platforms, then selects and suggests the best
+                                        Aermint makes bids and asks on the platforms, then selects and suggests the best
                                         available rate and displays the estimated rate on our site. The rates remain
                                         approximate until the transaction is actually made on the blockchain, which is why
                                         the exchange rate at the time of a transaction may differ slightly from the
@@ -34,7 +34,7 @@ export default function Privacy() {
                                 </div>
                                 <div className="privacy-content">
                                     <h5>Why should I trust you? </h5>
-                                    <p>Ekash is one of the most prominent instant personal finance managements that has
+                                    <p>Aermint is one of the most prominent instant personal finance managements that has
                                         gained the trust of more than 2M users from all over the world. The service provides
                                         safe and fast transactions without revealing users identities. We provide the best
                                         possible rates by comparing a wide range of reliable trading platforms and work with
@@ -60,23 +60,23 @@ export default function Privacy() {
                                     </ul>
                                 </div>
                                 <div className="privacy-content">
-                                    <h5>Does Ekash fix rates? </h5>
-                                    <p>Ekash mobile app does! Mobile app users will no longer be affected by the risks
+                                    <h5>Does Aermint fix rates? </h5>
+                                    <p>Aermint mobile app does! Mobile app users will no longer be affected by the risks
                                         associated with cash market fluctuations. Soon, the fixed-rate exchanges will also
                                         be implemented on the web version. To lock the current exchange rate, the user needs
                                         to click on the lock icon, which will result in them getting the exact same amount
                                         of cash as is displayed on the screen. The rate is fixed for 15 minutes, which
                                         should be more than enough to carry out the exchange.
                                     </p>
-                                    <p> Alternatively, Ekash offers our lowest fee of 0.25% for all cash-to-cash
+                                    <p> Alternatively, Aermint offers our lowest fee of 0.25% for all cash-to-cash
                                         exchanges made at a floating rate.</p>
                                 </div>
                                 <div className="privacy-content">
                                     <h5>No warranties : </h5>
-                                    <p>Ekash is provided “as is” without any representations or warranties. Ekash.com
+                                    <p>Aermint is provided “as is” without any representations or warranties. Aermint.com
                                         makes no representations or warranties in relation to this website or the
                                         information and materials provided on this website.</p>
-                                    <p>Ekash.com does not warrant that:</p>
+                                    <p>Aermint.com does not warrant that:</p>
                                     <ul>
                                         <li>
                                             <i className="fi fi-ss-circle" />
@@ -106,7 +106,7 @@ export default function Privacy() {
                                 </div>
                                 <div className="privacy-content">
                                     <h5>Modifications: </h5>
-                                    <p>Ekash.com may revise these terms of use for its website at any time without notice.
+                                    <p>Aermint.com may revise these terms of use for its website at any time without notice.
                                         By using this web site you are agreeing to be bound by the then current version of
                                         these terms of service.</p>
                                 </div>
@@ -115,14 +115,14 @@ export default function Privacy() {
                                     <ul>
                                         <li>
                                             <i className="fi fi-ss-circle" />
-                                            <p>Ekash.com reserves the rights under these terms and conditions to take
+                                            <p>Aermint.com reserves the rights under these terms and conditions to take
                                                 action if you breach these terms and conditions in any way. </p>
                                         </li>
                                         <li>
                                             <i className="fi fi-ss-circle" />
-                                            <p>Ekash.com may take such action as seems appropriate to deal with the
+                                            <p>Aermint.com may take such action as seems appropriate to deal with the
                                                 breach, including suspending your access to the website, suspending your
-                                                earnings made trough Ekash.com,prohibiting you from accessing the
+                                                earnings made trough Aermint.com,prohibiting you from accessing the
                                                 website, or bringing court proceedings against you.</p>
                                         </li>
                                     </ul>

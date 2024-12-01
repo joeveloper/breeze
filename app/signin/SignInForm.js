@@ -1,13 +1,15 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import ToastDisplay from "../../components/elements/ToastDisplay";
 
 const SignInForm = () => {
   const { signIn, isLoading, error } = useAuth();
+  const [errorMessage, setErrorMessage] = useState(null);
   const [credentials, setCredentials] = useState({ email: "", password: "" });
-  const [type, setType] = useState(null);
+  // const [type, setType] = useState(null);
 
   const handleInputChange = (e) => {
     e.preventDefault();
@@ -22,50 +24,23 @@ const SignInForm = () => {
     e.preventDefault();
     handleInputChange(e);
     setType(e.target.value);
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await signIn(type, credentials); // Use the signIn function from AuthContext
+    try {
+      await signIn(credentials);
+    } catch (error) {
+      console.error("Sign in failed:", error);
+      
+    }
   };
+
   return (
     <div className="auth-form">
       <h4>Sign In</h4>
       <form onSubmit={handleSubmit}>
         <div className="row">
-
-        <div className="col-12 mb-3">
-          <label className="form-label">User Type</label>
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="userType"
-              id="regularUser"
-              value="regularUser"
-              checked={(e) => handleChecked(e)}
-              onChange={(e) => handleChecked(e)}
-            />
-            <label className="form-check-label" htmlFor="regularUser">
-              Regular User
-            </label>
-          </div>
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="userType"
-              id="vendorUser"
-              value="vendorUser"
-              checked={(e) => handleChecked(e)}
-              onChange={(e) => handleChecked(e)}
-            />
-            <label className="form-check-label" htmlFor="vendorUser">
-              Vendor
-            </label>
-          </div>
-        </div>
-
           <div className="col-12 mb-3">
             <label className="form-label">Email</label>
             <input

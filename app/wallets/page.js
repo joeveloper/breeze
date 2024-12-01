@@ -1,16 +1,105 @@
 "use client";
-import ChartjsBalanceOvertime from "@/components/chart/ChartjsBalanceOvertime";
+
+import React, { useState, useEffect, useCallback, use } from "react";
 import ChartjsBalanceOvertime2 from "@/components/chart/ChartjsBalanceOvertime2";
 import ChartjsBalanceOvertime3 from "@/components/chart/ChartjsBalanceOvertime3";
 import ChartjsBalanceOvertime4 from "@/components/chart/ChartjsBalanceOvertime4";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
-import { useState } from "react";
+import ToastDisplay from "../../components/elements/ToastDisplay";
+import { useAuth } from "../../contexts/AuthContext";
+import { formatDate } from "../../utils/formatTime";
+
 export default function Wallets() {
   const [activeIndex, setActiveIndex] = useState(1);
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [transactionsList, setTransactionsList] = useState(null);
   const handleOnClick = (index) => {
     setActiveIndex(index);
   };
+  const { getCurrentUser } = useAuth();
+
+  const baseurl = "https://aermint.onrender.com/api/v1";
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchUserDetails();
+
+      await fetchUserTransactions();
+    };
+    fetchData();
+  }, []);
+
+  const fetchUserDetails = useCallback(async () => {
+    try {
+      const response = await fetch(`${baseurl}/user/auth/user-detail`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.data);
+        const user = await data?.data;
+        setUser(user);
+        console.log(user);
+      } else {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "An error occurred. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("An error occurred:", error.message);
+      setError(error.message); // Save error message to display
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const fetchUserTransactions = useCallback(async () => {
+    let storedUser = localStorage.getItem("currentUser");
+    if (storedUser) {
+      storedUser = JSON.parse(storedUser);
+    }
+    const userId = storedUser?.id || user?.id;
+    const routableNumber =
+      storedUser?.account.routable?.routableNumber || user?.routableNumber;
+    try {
+      console.log("here", userId, routableNumber);
+      const response = await fetch(
+        `${baseurl}/transactions/user?userId=${userId}&routableNumber=${routableNumber}&page=1&limit=10`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("tx", data.data);
+        setTransactionsList(data.data);
+      } else {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "An error occurred. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("An error occurred:", error.message);
+      setError(error.message); // Save error message to display
+    } finally {
+    }
+  }, [user]);
+
   return (
     <>
       <Layout breadcrumbTitle="Wallets">
@@ -20,24 +109,24 @@ export default function Wallets() {
               <div className="nav d-block">
                 <div className="row">
                   <div className="col-xl-12 col-md-6">
-                    <div
+                    {/* <div
                       onClick={() => handleOnClick(1)}
                       className={
                         activeIndex === 1 ? "wallet-nav active" : "wallet-nav"
                       }
-                    >
-                      <div className="wallet-nav-icon">
+                    > */}
+                    {/* <div className="wallet-nav-icon">
                         <span>
                           <i className="fi fi-rr-bank" />
                         </span>
-                      </div>
-                      <div className="wallet-nav-text">
+                      </div> */}
+                    {/* <div className="wallet-nav-text">
                         <h3>City Bank</h3>
                         <p>$221,478</p>
-                      </div>
-                    </div>
+                      </div> */}
+                    {/* </div> */}
                   </div>
-                  <div className="col-xl-12 col-md-6">
+                  {/* <div className="col-xl-12 col-md-6">
                     <div
                       onClick={() => handleOnClick(2)}
                       className={
@@ -90,12 +179,12 @@ export default function Wallets() {
                         <p>$221,478</p>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="add-card-link">
-                <h5 className="mb-0">Add new wallet</h5>
-                <Link href="/add-new-account">
+                <h5 className="mb-0">Send Money</h5>
+                <Link href="/add-bank">
                   <i className="fi fi-rr-square-plus" />
                 </Link>
               </div>
@@ -109,29 +198,32 @@ export default function Wallets() {
                       : "tab-pane fade"
                   }
                 >
-                  <div className="wallet-tab-title">
+                  {/* <div className="wallet-tab-title">
                     <h3>City Bank</h3>
-                  </div>
+                  </div> */}
                   <div className="row">
                     <div className="col-xxl-6 col-xl-6 col-lg-6">
                       <div className="card">
                         <div className="card-body">
                           <div className="wallet-total-balance">
                             <p className="mb-0">Total Balance</p>
-                            <h2>$221,478</h2>
+                            <h2>
+                              {user?.account?.currency}{" "}
+                              {user?.account?.upperBalance < 1 && 20000}
+                            </h2>
                           </div>
-                          <div className="funds-credit">
+                          {/* <div className="funds-credit">
                             <p className="mb-0">Personal Funds</p>
                             <h5>$32,500.28</h5>
                           </div>
                           <div className="funds-credit">
                             <p className="mb-0">Credit Limits</p>
                             <h5>$2500.00</h5>
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                     </div>
-                    <div className="col-xxl-6 col-xl-6 col-lg-6">
+                    {/* <div className="col-xxl-6 col-xl-6 col-lg-6">
                       <div className="credit-card visa">
                         <div className="type-brand">
                           <h4>Debit Card</h4>
@@ -180,8 +272,8 @@ export default function Wallets() {
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                    </div> */}
+                    {/* <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6">
                       <div className="stat-widget-1">
                         <h6>Total Balance</h6>
                         <h3>$ 432568</h3>
@@ -193,8 +285,8 @@ export default function Wallets() {
                           Last month <strong>$24,478</strong>
                         </p>
                       </div>
-                    </div>
-                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                    </div> */}
+                    {/* <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6">
                       <div className="stat-widget-1">
                         <h6>Monthly Expenses</h6>
                         <h3>$ 432568</h3>
@@ -206,8 +298,8 @@ export default function Wallets() {
                           Last month <strong>$24,478</strong>
                         </p>
                       </div>
-                    </div>
-                    <div className="col-xxl-12">
+                    </div> */}
+                    {/* <div className="col-xxl-12">
                       <div className="card">
                         <div className="card-header">
                           <h4 className="card-title">Balance Overtime</h4>
@@ -224,7 +316,7 @@ export default function Wallets() {
                           <ChartjsBalanceOvertime />
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                     <div className="col-xl-12">
                       <div className="card">
                         <div className="card-header">
@@ -238,82 +330,31 @@ export default function Wallets() {
                                   <tr>
                                     <th>Category</th>
                                     <th>Date</th>
-                                    <th>Description</th>
+                                    <th>Status</th>
                                     <th>Amount</th>
                                     <th>Currency</th>
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  <tr>
-                                    <td>
-                                      <span className="table-category-icon">
-                                        <i className="bg-emerald-500 fi fi-rr-barber-shop" />
-                                        Beauty
-                                      </span>
-                                    </td>
-                                    <td>12.12.2023</td>
-                                    <td>
-                                      Grocery Items and Beverage soft drinks
-                                    </td>
-                                    <td>-32.20</td>
-                                    <td>USD</td>
-                                  </tr>
-                                  <tr>
-                                    <td>
-                                      <span className="table-category-icon">
-                                        <i className="bg-teal-500 fi fi-rr-receipt" />
-                                        Bills &amp; Fees
-                                      </span>
-                                    </td>
-                                    <td>12.12.2023</td>
-                                    <td>
-                                      Grocery Items and Beverage soft drinks
-                                    </td>
-                                    <td>-32.20</td>
-                                    <td>USD</td>
-                                  </tr>
-                                  <tr>
-                                    <td>
-                                      <span className="table-category-icon">
-                                        <i className="bg-cyan-500 fi fi-rr-car-side" />
-                                        Car
-                                      </span>
-                                    </td>
-                                    <td>12.12.2023</td>
-                                    <td>
-                                      Grocery Items and Beverage soft drinks
-                                    </td>
-                                    <td>-32.20</td>
-                                    <td>USD</td>
-                                  </tr>
-                                  <tr>
-                                    <td>
-                                      <span className="table-category-icon">
-                                        <i className="bg-sky-500 fi fi-rr-graduation-cap" />
-                                        Education
-                                      </span>
-                                    </td>
-                                    <td>12.12.2023</td>
-                                    <td>
-                                      Grocery Items and Beverage soft drinks
-                                    </td>
-                                    <td>-32.20</td>
-                                    <td>USD</td>
-                                  </tr>
-                                  <tr>
-                                    <td>
-                                      <span className="table-category-icon">
-                                        <i className="bg-blue-500 fi fi-rr-clapperboard-play" />
-                                        Entertainment
-                                      </span>
-                                    </td>
-                                    <td>12.12.2023</td>
-                                    <td>
-                                      Grocery Items and Beverage soft drinks
-                                    </td>
-                                    <td>-32.20</td>
-                                    <td>USD</td>
-                                  </tr>
+                                  {transactionsList?.transactions?.length > 0 &&
+                                    transactionsList?.transactions?.map(
+                                      (transaction, index) => (
+                                        <tr key={index}>
+                                          <td>
+                                            <span className="table-category-icon">
+                                              <i className="bg-emerald-500 fi fi-rr-barber-shop" />
+                                              {transaction?.transactionType}
+                                            </span>
+                                          </td>
+                                          <td>
+                                            {formatDate(transaction?.createdAt)}
+                                          </td>
+                                          <td>{transaction?.status}</td>
+                                          <td>{transaction?.amount}</td>
+                                          <td>{transaction?.currency}</td>
+                                        </tr>
+                                      )
+                                    )}
                                 </tbody>
                               </table>
                             </div>
@@ -990,6 +1031,15 @@ export default function Wallets() {
             </div>
           </div>
         </div>
+        {error && (
+          <ToastDisplay
+            title="Error"
+            message={error}
+            type="error"
+            show={error}
+            onClose={() => setError(null)}
+          />
+        )}
       </Layout>
     </>
   );

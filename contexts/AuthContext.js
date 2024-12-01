@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import ToastDisplay from "../components/elements/ToastDisplay";
 
 const AuthContext = createContext({
   auth: false,
@@ -15,72 +16,64 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
-  // const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const baseUrl = "https://aermint.onrender.com/api/v1";
 
-  const getAuthenticatedUser = localStorage.getItem("isAuthenticated");
+  // States to manage authentication and user data
+  const [auth, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  // Use JSON parsing instead of Base64 decoding
-  const decodedData = getAuthenticatedUser
-    ? JSON.parse(getAuthenticatedUser)
-    : false;
+  useEffect(() => {
+    // Access localStorage on the client side
+    if (typeof window !== "undefined") {
+      const getAuthenticatedUser = localStorage.getItem("isAuthenticated");
+      const user = localStorage.getItem("currentUser");
 
-  const user = localStorage.getItem("currentUser");
+      const decodedAuth = getAuthenticatedUser
+        ? JSON.parse(getAuthenticatedUser)
+        : false;
+      const decodedUser = user ? JSON.parse(user) : null;
 
-  const decodedCurrentUser = user ? JSON.parse(user) : null;
-
-  const [auth, setIsAuthenticated] = useState(decodedData);
-  const [currentUser, setCurrentUser] = useState(decodedCurrentUser);
+      setIsAuthenticated(decodedAuth);
+      setCurrentUser(decodedUser);
+    }
+  }, []);
 
   // Function to set auth state and current user
   const setAuth = (authState, user = null) => {
     setIsAuthenticated(authState);
     setCurrentUser(user);
+
+    // Update localStorage on the client side
+    if (typeof window !== "undefined") {
+      const authData = authState ? JSON.stringify(authState) : false;
+      const currentUserData = user ? JSON.stringify(user) : null;
+
+      localStorage.setItem("isAuthenticated", authData);
+      localStorage.setItem("currentUser", currentUserData);
+    }
   };
 
   const getCurrentUser = () => currentUser;
   const getAuth = () => auth;
 
-  useEffect(() => {
-    // Directly use JSON for localStorage without Base64 encoding
-    const authData = auth ? JSON.stringify(auth) : false;
-    const currentUserData = currentUser ? JSON.stringify(currentUser) : null;
-
-    localStorage.setItem("isAuthenticated", authData);
-    localStorage.setItem("currentUser", currentUserData);
-  }, [auth, currentUser]);
-
   // Handle sign-in logic
-  const signIn = async (userType, credentials) => {
+  const signIn = async (credentials) => {
     setIsLoading(true);
     setError(null);
-    console.log("login creds", credentials);
-    console.log("userType", userType);
-
-    // Define the API endpoint based on the user type
-    let url = "";
-    if (userType && userType === "regularUser") {
-      url = "user";
-    } else if (userType && userType === "vendorUser") {
-      url = "vendor";
-    } else {
-      throw new Error("Invalid user type selected.");
-    }
-
     try {
-      const response = await fetch(`${baseUrl}/${url}/auth/login`, {
+      const response = await fetch(`${baseUrl}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
         },
         body: JSON.stringify(credentials),
       });
 
       if (!response.ok) {
-        throw new Error("Invalid email or password.");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Incorrect email or password.");
       }
 
       const data = await response.json();
@@ -96,11 +89,37 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const signOut = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("currentUser");
+      localStorage.removeItem("isAuthenticated");
+    }
+    setAuth(false, null);
+    console.log("logout successful");
+  };
+
   return (
     <AuthContext.Provider
-      value={{ currentUser, signIn, setAuth, getCurrentUser, getAuth }}
+      value={{
+        currentUser,
+        signIn,
+        setAuth,
+        getCurrentUser,
+        getAuth,
+        signOut,
+      }}
     >
       {children}
+      {error && (
+        <ToastDisplay
+          title="Error"
+          message={error}
+          type="error"
+          show={error}
+          onClose={() => setError(null)}
+        />
+      )}
     </AuthContext.Provider>
   );
 };

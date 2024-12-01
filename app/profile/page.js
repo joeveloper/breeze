@@ -9,31 +9,35 @@ import ChartjsProfileWallet4 from "@/components/chart/ChartjsProfileWallet4";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { useAuth } from "../../contexts/AuthContext";
+import { formatDate } from "../../utils/formatTime";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
+  const [date, setDate] = useState(null);
 
   const { getCurrentUser } = useAuth();
 
   const baseurl = "https://aermint.onrender.com/api/v1";
 
-  //   console.log("userId:", userId);
+  console.log("user:", getCurrentUser()?.account);
 
   const fetchUserDetails = async () => {
-    const userId = getCurrentUser()?.id;
-    const routableUserId = getCurrentUser()?.account?.routable?.routableNumber;
-    console.log(getCurrentUser());
-    console.log(routableUserId);
-
+    
     try {
-      const response = await fetch(
-        `${baseurl}/user/auth/user-detail/?userId=${userId}&routableNumber=${routableUserId}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
+      let url = "";
+
+    if (getCurrentUser()?.account?.interactableType === "USER") {
+      url = `user/auth/user-detail`;
+    } else if (getCurrentUser()?.account?.interactableType === "VENDOR") {
+      url = `vendor/auth/vendor-detail`;
+    }
+      const response = await fetch(`${baseurl}/${url}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        }
-      );
+        },
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -50,9 +54,17 @@ export default function Profile() {
     }
   };
 
+  // const handleDate = () => {
+  //   const newDate = user &&  formatDate(user?.createdAt);
+  //   setDate(newDate);
+  // };
+
   useEffect(() => {
     fetchUserDetails();
+    // handleDate();
   }, []);
+
+ 
 
   return (
     <>
@@ -63,22 +75,29 @@ export default function Profile() {
               <div className="card-body">
                 <div className="profile-name">
                   <div className="d-flex">
-                    <img src="./images/avatar/1.jpg" alt="" />
+                    <img src={user?.avatar} alt="" />
                     <div className="flex-grow-1">
-                      <h4 className="mb-0">Henry John Paulin</h4>
-                      <p>henry@gmail.com</p>
+                      <h4 className="mb-0">
+                        {user?.firstName} {user?.lastName}
+                      </h4>
+                      <p>{user?.email}</p>
                     </div>
                   </div>
                 </div>
                 <div className="profile-reg">
                   <div className="registered">
-                    <h5>25 June 2024</h5>
-                    <p>Registered</p>
+                    <h5>Created: {user && formatDate(user?.createdAt)}</h5>
+                    <p>Verified</p>
                   </div>
                   <span className="reg_divider" />
                   <div className="rank">
-                    <h5>Referral</h5>
-                    <p>05</p>
+                    <h5>{user?.account.interactableType}</h5>
+                    <p>{user?.account.routable.routableNumber}</p>
+                  </div>
+                  <span className="reg_divider" />
+                  <div className="rank">
+                    <h5>{user?.country}</h5>
+                    <p>₦ - {user?.account.currency}</p>
                   </div>
                 </div>
                 <div className="profile-wallet-nav">
@@ -92,13 +111,13 @@ export default function Profile() {
                         <span className="icons usd">
                           <i className="fi fi-rr-bank" />
                         </span>
-                        City Bank
+                        Wallet
                         <span>
                           <i className="fi fi-bs-angle-right" />
                         </span>
                       </Link>
                     </li>
-                    <li>
+                    {/* <li>
                       <Link data-bs-toggle="tab" href="#debit-card">
                         <span className="icons gift">
                           <i className="fi fi-rr-credit-card" />
@@ -108,29 +127,7 @@ export default function Profile() {
                           <i className="fi fi-bs-angle-right" />
                         </span>
                       </Link>
-                    </li>
-                    <li>
-                      <Link data-bs-toggle="tab" href="#visa-card">
-                        <span className="icons cart">
-                          <i className="fi fi-brands-visa" />
-                        </span>
-                        Visa Card
-                        <span>
-                          <i className="fi fi-bs-angle-right" />
-                        </span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link data-bs-toggle="tab" href="#cash">
-                        <span className="icons link">
-                          <i className="fi fi-rr-money-bill-wave-alt" />
-                        </span>
-                        Cash
-                        <span>
-                          <i className="fi fi-bs-angle-right" />
-                        </span>
-                      </Link>
-                    </li>
+                    </li> */}
                   </ul>
                 </div>
               </div>
@@ -144,15 +141,15 @@ export default function Profile() {
                     <div className="wallet-progress-data">
                       <div className="d-flex justify-content-between">
                         <div>
-                          <span>Spend</span>
-                          <h3>$1458.30</h3>
+                          <span>Lower Balance</span>
+                          <h3>{user?.account.lowerBalance}</h3>
                         </div>
                         <div className="text-end">
-                          <span>Budget</span>
-                          <h3>$1458.30</h3>
+                          <span>Completed Balance</span>
+                          <h3>{user?.account.completedBalance}</h3>
                         </div>
                       </div>
-                      <div className="progress">
+                      {/* <div className="progress">
                         <div
                           className="progress-bar"
                           style={{ width: "25%" }}
@@ -162,7 +159,7 @@ export default function Profile() {
                       <div className="d-flex justify-content-between mt-2">
                         <span>25%</span>
                         <span>75%</span>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
