@@ -8,18 +8,23 @@ import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import ToastDisplay from "../../components/elements/ToastDisplay";
 import { useAuth } from "../../contexts/AuthContext";
-import { formatDate } from "../../utils/formatTime";
+import { formatDate } from "../../utils/dateAndTimeFormatter";
+import Loading from "../loading";
+import { useRouter } from "next/navigation";
 
 export default function Wallets() {
   const [activeIndex, setActiveIndex] = useState(1);
   const [user, setUser] = useState(null);
+  // const [storedUser, setStoredUser] = useState(null);
+  const [userType, setUserType] = useState(null);
+  const [count, setCount] = useState(0);
+  const [page, setPage] = useState(1);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [transactionsList, setTransactionsList] = useState(null);
-  const handleOnClick = (index) => {
-    setActiveIndex(index);
-  };
-  const { getCurrentUser } = useAuth();
+  const [pinStatus, setPinStatus] = useState(false);
+  const [transactionsList, setTransactionsList] = useState([]);
+
+  const router = useRouter();
 
   const baseurl = "https://aermint.onrender.com/api/v1";
 
@@ -33,8 +38,14 @@ export default function Wallets() {
   }, []);
 
   const fetchUserDetails = useCallback(async () => {
+    const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+    const type =
+      storedUser?.account?.interactableType === "USER"
+        ? "user/auth/user-detail"
+        : "vendor/auth/vendor-detail";
     try {
-      const response = await fetch(`${baseurl}/user/auth/user-detail`, {
+      // setLoading(true);
+      const response = await fetch(`${baseurl}/${type}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -51,29 +62,120 @@ export default function Wallets() {
       } else {
         const errorData = await response.json();
         throw new Error(
-          errorData.message || "An error occurred. Please try again."
+          errorData?.message || "An error occurred. Please try again."
         );
       }
     } catch (error) {
       console.error("An error occurred:", error.message);
       setError(error.message); // Save error message to display
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   }, [user]);
 
-  const fetchUserTransactions = useCallback(async () => {
-    let storedUser = localStorage.getItem("currentUser");
-    if (storedUser) {
-      storedUser = JSON.parse(storedUser);
-    }
+  // const fetchUserTransactions = useCallback(async () => {
+  //   const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+  //   const userId = storedUser?.id || user?.id;
+  //   const routableNumber =
+  //     storedUser?.account.routable?.routableNumber || user?.routableNumber;
+  //   const type =
+  //     storedUser?.account?.interactableType === "USER"
+  //       ? "user?userId"
+  //       : "vendor?vendorId";
+  //   try {
+  //     setLoading(true);
+  //     const response = await fetch(
+  //       `${baseurl}/transactions/${type}=${userId}&routableNumber=${routableNumber}&page=1&limit=10`,
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //         },
+  //       }
+  //     );
+
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log("tx", data.data);
+  //       setTransactionsList(data.data);
+  //     } else {
+  //       const errorData = await response.json();
+  //       throw new Error(
+  //         errorData.message || "An error occurred. Please try again."
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error("An error occurred:", error.message);
+  //     setError(error.message); // Save error message to display
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, [user]);
+
+  // const fetchUserTransactions = useCallback(
+  //   async (page = 1) => {
+  //     const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+  //     const userId = storedUser?.id || user?.id;
+  //     const routableNumber =
+  //       storedUser?.account.routable?.routableNumber || user?.routableNumber;
+  //     const type =
+  //       storedUser?.account?.interactableType === "USER"
+  //         ? "user?userId"
+  //         : "vendor?vendorId";
+
+  //     try {
+  //       setLoading(true);
+  //       const response = await fetch(
+  //         `${baseurl}/transactions/${type}=${userId}&routableNumber=${routableNumber}&page=${page}&limit=10`,
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //           },
+  //         }
+  //       );
+
+  //       if (response.ok) {
+  //         const data = await response.json();
+  //         setTransactionsList((prevTransactions) => [
+  //           ...prevTransactions,
+  //           ...data.data, // Append the new data to existing data
+  //         ]);
+  //       } else {
+  //         const errorData = await response.json();
+  //         throw new Error(
+  //           errorData.message || "An error occurred. Please try again."
+  //         );
+  //       }
+  //     } catch (error) {
+  //       console.error("An error occurred:", error.message);
+  //       setError(error.message); // Save error message to display
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   },
+  //   [user]
+  // );
+
+  const fetchUserTransactions = useCallback(async (pageNum) => {
+    pageNum = page || 1;
+    const storedUser = JSON.parse(localStorage.getItem("currentUser"));
     const userId = storedUser?.id || user?.id;
     const routableNumber =
       storedUser?.account.routable?.routableNumber || user?.routableNumber;
+    const type =
+      storedUser?.account?.interactableType === "USER"
+        ? "user?userId"
+        : "vendor?vendorId";
+
     try {
-      console.log("here", userId, routableNumber);
+      setLoading(true);
+
+      // Modify the URL to fetch the correct data
       const response = await fetch(
-        `${baseurl}/transactions/user?userId=${userId}&routableNumber=${routableNumber}&page=1&limit=10`,
+        `${baseurl}/transactions/${type}=${userId}&routableNumber=${routableNumber}&page=${pageNum}&limit=10`, // Use `page` for pagination
         {
           method: "GET",
           headers: {
@@ -86,7 +188,15 @@ export default function Wallets() {
       if (response.ok) {
         const data = await response.json();
         console.log("tx", data.data);
-        setTransactionsList(data.data);
+
+        // Ensure that `data.data` is an array before appending
+        if (data && data?.data) {
+          setCount(data?.data?.meta?.totalCount);
+          setTransactionsList((prevTransactions) => [
+            ...prevTransactions, // Append new transactions to the previous list
+            ...data?.data?.transactions, // Add the new transactions fetched from API
+          ]);
+        }
       } else {
         const errorData = await response.json();
         throw new Error(
@@ -97,97 +207,90 @@ export default function Wallets() {
       console.error("An error occurred:", error.message);
       setError(error.message); // Save error message to display
     } finally {
+      setLoading(false);
     }
-  }, [user]);
+  }, [user, page]); // Add `page` as a dependency to re-fetch when page changes
+
+  const handleScroll = (event) => {
+    const bottom =
+      event.target.scrollHeight ===
+      event.target.scrollTop + event.target.clientHeight;
+    if (bottom && !loading) {
+      // If the user has reached the bottom, load more transactions
+      setPage((prevPage) => {
+        const nextPage = prevPage + 1;
+        fetchUserTransactions(nextPage);
+        return nextPage;
+      });
+    }
+  };
+
+  const checkPinStatus = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${baseurl}/user/auth/pin-status`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.data);
+        setPinStatus(true);
+      } else {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "An error occurred. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("An error occurred:", error.message);
+      setError(error.message); // Save error message to display
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRowClick = (transaction) => {
+    const transactionData =
+      transaction && encodeURIComponent(JSON.stringify(transaction));
+    router.push(`/transaction-details?data=${transactionData}`);
+  };
 
   return (
     <>
       <Layout breadcrumbTitle="Wallets">
+        {loading && <Loading />}
+
+        {user &&
+          user?.account?.interactableType === "USER" &&
+          !pinStatus && (
+            <ToastDisplay
+              message={
+                <span>
+                  <Link href="/create-pin">Click here to create a pin.</Link>
+                </span>
+              }
+              type="warning"
+            />
+          )}
         <div className="wallet-tab">
           <div className="row g-0">
             <div className="col-xl-3">
               <div className="nav d-block">
-                <div className="row">
-                  <div className="col-xl-12 col-md-6">
-                    {/* <div
-                      onClick={() => handleOnClick(1)}
-                      className={
-                        activeIndex === 1 ? "wallet-nav active" : "wallet-nav"
-                      }
-                    > */}
-                    {/* <div className="wallet-nav-icon">
-                        <span>
-                          <i className="fi fi-rr-bank" />
-                        </span>
-                      </div> */}
-                    {/* <div className="wallet-nav-text">
-                        <h3>City Bank</h3>
-                        <p>$221,478</p>
-                      </div> */}
-                    {/* </div> */}
-                  </div>
-                  {/* <div className="col-xl-12 col-md-6">
-                    <div
-                      onClick={() => handleOnClick(2)}
-                      className={
-                        activeIndex === 2 ? "wallet-nav active" : "wallet-nav"
-                      }
-                    >
-                      <div className="wallet-nav-icon">
-                        <span>
-                          <i className="fi fi-rr-credit-card" />
-                        </span>
-                      </div>
-                      <div className="wallet-nav-text">
-                        <h3>Debit Card</h3>
-                        <p>$221,478</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-xl-12 col-md-6">
-                    <div
-                      onClick={() => handleOnClick(3)}
-                      className={
-                        activeIndex === 3 ? "wallet-nav active" : "wallet-nav"
-                      }
-                    >
-                      <div className="wallet-nav-icon">
-                        <span>
-                          <i className="fi fi-brands-visa" />
-                        </span>
-                      </div>
-                      <div className="wallet-nav-text">
-                        <h3>Visa Card</h3>
-                        <p>$221,478</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-xl-12 col-md-6">
-                    <div
-                      onClick={() => handleOnClick(4)}
-                      className={
-                        activeIndex === 4 ? "wallet-nav active" : "wallet-nav"
-                      }
-                    >
-                      <div className="wallet-nav-icon">
-                        <span>
-                          <i className="fi fi-rr-money-bill-wave-alt" />
-                        </span>
-                      </div>
-                      <div className="wallet-nav-text">
-                        <h3>Cash</h3>
-                        <p>$221,478</p>
-                      </div>
-                    </div>
-                  </div> */}
+                <div className="row"></div>
+              </div>
+              {user?.account?.interactableType === "USER" && (
+                <div className="add-card-link">
+                  <h5 className="mb-0">Send Money</h5>
+                  <Link href={pinStatus ? "/add-bank" : "#"}>
+                    <i className="fi fi-rr-square-plus" />
+                  </Link>
                 </div>
-              </div>
-              <div className="add-card-link">
-                <h5 className="mb-0">Send Money</h5>
-                <Link href="/add-bank">
-                  <i className="fi fi-rr-square-plus" />
-                </Link>
-              </div>
+              )}
             </div>
             <div className="col-xl-9">
               <div className="tab-content wallet-tab-content">
@@ -198,9 +301,6 @@ export default function Wallets() {
                       : "tab-pane fade"
                   }
                 >
-                  {/* <div className="wallet-tab-title">
-                    <h3>City Bank</h3>
-                  </div> */}
                   <div className="row">
                     <div className="col-xxl-6 col-xl-6 col-lg-6">
                       <div className="card">
@@ -212,115 +312,13 @@ export default function Wallets() {
                               {user?.account?.upperBalance < 1 && 20000}
                             </h2>
                           </div>
-                          {/* <div className="funds-credit">
-                            <p className="mb-0">Personal Funds</p>
-                            <h5>$32,500.28</h5>
-                          </div>
-                          <div className="funds-credit">
-                            <p className="mb-0">Credit Limits</p>
-                            <h5>$2500.00</h5>
-                          </div> */}
                         </div>
                       </div>
                     </div>
-                    {/* <div className="col-xxl-6 col-xl-6 col-lg-6">
-                      <div className="credit-card visa">
-                        <div className="type-brand">
-                          <h4>Debit Card</h4>
-                          <img src="./images/cc/visa.png" alt="" />
-                        </div>
-                        <div className="cc-number">
-                          <h6>1234</h6>
-                          <h6>5678</h6>
-                          <h6>7890</h6>
-                          <h6>9875</h6>
-                        </div>
-                        <div className="cc-holder-exp">
-                          <h5>Saiful Islam</h5>
-                          <div className="exp">
-                            <span>EXP:</span>
-                            <strong>12/21</strong>
-                          </div>
-                        </div>
-                        <div className="cc-info">
-                          <div className="row justify-content-between align-items-center">
-                            <div className="col-5">
-                              <div className="d-flex">
-                                <p className="me-3">Status</p>
-                                <p>
-                                  <strong>Active</strong>
-                                </p>
-                              </div>
-                              <div className="d-flex">
-                                <p className="me-3">Currency</p>
-                                <p>
-                                  <strong>USD</strong>
-                                </p>
-                              </div>
-                            </div>
-                            <div className="col-xl-7">
-                              <div className="d-flex justify-content-between">
-                                <div className="ms-3">
-                                  <p>Credit Limit</p>
-                                  <p>
-                                    <strong>2000 USD</strong>
-                                  </p>
-                                </div>
-                                <div id="circle1" />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div> */}
-                    {/* <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6">
-                      <div className="stat-widget-1">
-                        <h6>Total Balance</h6>
-                        <h3>$ 432568</h3>
-                        <p>
-                          <span className="text-success">
-                            <i className="fi fi-rr-arrow-trend-up" />
-                            2.47%
-                          </span>
-                          Last month <strong>$24,478</strong>
-                        </p>
-                      </div>
-                    </div> */}
-                    {/* <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6">
-                      <div className="stat-widget-1">
-                        <h6>Monthly Expenses</h6>
-                        <h3>$ 432568</h3>
-                        <p>
-                          <span className="text-success">
-                            <i className="fi fi-rr-arrow-trend-up" />
-                            2.47%
-                          </span>
-                          Last month <strong>$24,478</strong>
-                        </p>
-                      </div>
-                    </div> */}
-                    {/* <div className="col-xxl-12">
-                      <div className="card">
-                        <div className="card-header">
-                          <h4 className="card-title">Balance Overtime</h4>
-                        </div>
-                        <div className="card-body">
-                          <div className="chartjs-size-monitor">
-                            <div className="chartjs-size-monitor-expand">
-                              <div />
-                            </div>
-                            <div className="chartjs-size-monitor-shrink">
-                              <div />
-                            </div>
-                          </div>
-                          <ChartjsBalanceOvertime />
-                        </div>
-                      </div>
-                    </div> */}
                     <div className="col-xl-12">
                       <div className="card">
                         <div className="card-header">
-                          <h4 className="card-title">Transaction History</h4>
+                          <h4 className="card-title">Transactions ({count})</h4>
                         </div>
                         <div className="card-body">
                           <div className="transaction-table">
@@ -335,11 +333,23 @@ export default function Wallets() {
                                     <th>Currency</th>
                                   </tr>
                                 </thead>
-                                <tbody>
-                                  {transactionsList?.transactions?.length > 0 &&
-                                    transactionsList?.transactions?.map(
+                                <tbody
+                                  style={{
+                                    maxHeight: "400px",
+                                    overflowY: "auto",
+                                  }}
+                                  onScroll={handleScroll}
+                                >
+                                  {transactionsList?.length > 0 &&
+                                    transactionsList?.map(
                                       (transaction, index) => (
-                                        <tr key={index}>
+                                        <tr
+                                          key={index}
+                                          onClick={() =>
+                                            handleRowClick(transaction)
+                                          }
+                                          style={{ cursor: "pointer" }}
+                                        >
                                           <td>
                                             <span className="table-category-icon">
                                               <i className="bg-emerald-500 fi fi-rr-barber-shop" />

@@ -1,8 +1,8 @@
 {
-  "/add-bank/page": "app/add-bank/page.js",
-  "/finalize-payment/page": "app/finalize-payment/page.js",
-  "/settings-general/page": "app/settings-general/page.js",
   "/wallets/page": "app/wallets/page.js",
-  "/budgets/page": "app/budgets/page.js",
+  "/transaction-details/page": "app/transaction-details/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/settings-profile/page": "app/settings-profile/page.js",
   "/not-found": "app/not-found.js"
 }

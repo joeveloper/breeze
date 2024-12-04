@@ -3,6 +3,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ToastDisplay from "../components/elements/ToastDisplay";
+import Loading from "../app/loading";
 
 const AuthContext = createContext({
   auth: false,
@@ -80,7 +81,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("accessToken", data.data.token);
       setAuth(true, data.data);
       console.log(data.data);
-      router.push("/"); // Redirect to home page
+      router.push("/wallets"); // Redirect to home page
       console.log("login successful");
     } catch (err) {
       setError(err.message);
@@ -111,6 +112,7 @@ export const AuthProvider = ({ children }) => {
       }}
     >
       {children}
+      {isLoading && <Loading />}
       {error && (
         <ToastDisplay
           title="Error"

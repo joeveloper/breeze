@@ -9,11 +9,12 @@ import ChartjsProfileWallet4 from "@/components/chart/ChartjsProfileWallet4";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { useAuth } from "../../contexts/AuthContext";
-import { formatDate } from "../../utils/formatTime";
+import { formatDate } from "../../utils/dateAndTimeFormatter";
+import Loading from "../loading";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
-  const [date, setDate] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const { getCurrentUser } = useAuth();
 
@@ -22,15 +23,15 @@ export default function Profile() {
   console.log("user:", getCurrentUser()?.account);
 
   const fetchUserDetails = async () => {
-    
     try {
+      setLoading(true);
       let url = "";
 
-    if (getCurrentUser()?.account?.interactableType === "USER") {
-      url = `user/auth/user-detail`;
-    } else if (getCurrentUser()?.account?.interactableType === "VENDOR") {
-      url = `vendor/auth/vendor-detail`;
-    }
+      if (getCurrentUser()?.account?.interactableType === "USER") {
+        url = `user/auth/user-detail`;
+      } else if (getCurrentUser()?.account?.interactableType === "VENDOR") {
+        url = `vendor/auth/vendor-detail`;
+      }
       const response = await fetch(`${baseurl}/${url}`, {
         method: "GET",
         headers: {
@@ -51,24 +52,19 @@ export default function Profile() {
       }
     } catch (error) {
       console.error("An error occurred:", error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // const handleDate = () => {
-  //   const newDate = user &&  formatDate(user?.createdAt);
-  //   setDate(newDate);
-  // };
-
   useEffect(() => {
     fetchUserDetails();
-    // handleDate();
   }, []);
-
- 
 
   return (
     <>
       <Layout breadcrumbTitle="Profile">
+        {loading && <Loading />}
         <div className="row">
           <div className="col-xl-4">
             <div className="card">
@@ -117,17 +113,6 @@ export default function Profile() {
                         </span>
                       </Link>
                     </li>
-                    {/* <li>
-                      <Link data-bs-toggle="tab" href="#debit-card">
-                        <span className="icons gift">
-                          <i className="fi fi-rr-credit-card" />
-                        </span>
-                        Debit Card
-                        <span>
-                          <i className="fi fi-bs-angle-right" />
-                        </span>
-                      </Link>
-                    </li> */}
                   </ul>
                 </div>
               </div>
@@ -149,17 +134,6 @@ export default function Profile() {
                           <h3>{user?.account.completedBalance}</h3>
                         </div>
                       </div>
-                      {/* <div className="progress">
-                        <div
-                          className="progress-bar"
-                          style={{ width: "25%" }}
-                          role="progressbar"
-                        ></div>
-                      </div>
-                      <div className="d-flex justify-content-between mt-2">
-                        <span>25%</span>
-                        <span>75%</span>
-                      </div> */}
                     </div>
                   </div>
                 </div>

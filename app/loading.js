@@ -1,6 +1,6 @@
 import Preloader from '@/components/elements/Preloader'
 
-export default function loading() {
+export default function Loading() {
     return (
         <>
             <Preloader />

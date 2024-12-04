@@ -4,17 +4,20 @@ import React, { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { useRouter } from "next/navigation";
 import ToastDisplay from "../../components/elements/ToastDisplay";
+import Loading from "../loading";
 
 export default function AddBank() {
   const [vendor, setVendor] = useState(null);
   const [query, setQuery] = useState("");
   const [amount, setAmount] = useState(0);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const baseUrl = "https://aermint.onrender.com/api/v1";
   const router = useRouter();
 
   const fetchVendorDetails = async () => {
     try {
+      setLoading(true);
       const response = await fetch(
         `${baseUrl}/vendor/auth/vendor-detail?routableNumber=${query}`,
         {
@@ -34,15 +37,17 @@ export default function AddBank() {
 
       const data = await response.json();
       setVendor(data?.data);
-      console.log("vendor", data?.data);
     } catch (error) {
       console.error(error.message);
       setError(error.message); // Save error message to display
+    } finally {
+      setLoading(false);
     }
   };
 
   const initiateTransaction = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${baseUrl}/transactions`, {
         method: "POST",
         headers: {
@@ -68,6 +73,8 @@ export default function AddBank() {
       );
     } catch (error) {
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,6 +96,7 @@ export default function AddBank() {
   return (
     <>
       <Layout breadcrumbTitle="New Transaction">
+        {loading && <Loading />}
         <div className="verification section-padding">
           <div className="container h-100">
             <div className="row justify-content-center h-100 align-items-center">

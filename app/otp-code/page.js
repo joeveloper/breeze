@@ -50,7 +50,7 @@ export default function OtpCode() {
         console.log(data);
         localStorage.setItem("accessToken", data.data.token);
         setAuth(true, data.data);
-        router.push("/");
+        router.push("/wallets");
       } else {
         const errorData = await response.json();
         throw new Error(
