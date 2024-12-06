@@ -73,7 +73,11 @@ export default function AddBank() {
       const data = await response.json();
       setVendor(data?.data);
       router.push(`/wallets`);
-    } catch (error) {}
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = (e) => {
