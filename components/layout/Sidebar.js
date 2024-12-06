@@ -10,14 +10,14 @@ export default function Sidebar() {
                 <div className="brand-logo"><Link className="full-logo" href="/"><img src="./images/logoi.png" alt="" width={30} /></Link></div>
                 <div className="menu">
                     <ul>
-                        <li className={pathname == "/" ? "active" : ""}>
+                        {/* <li className={pathname == "/" ? "active" : ""}>
                             <Link href="/">
                                 <span>
                                     <i className="fi fi-rr-dashboard" />
                                 </span>
                                 <span className="nav-text">Dashboard</span>
                             </Link>
-                        </li>
+                        </li> */}
                         <li className={pathname == "/wallets" ? "active" : ""}>
                             <Link href="/wallets">
                                 <span>
@@ -26,7 +26,7 @@ export default function Sidebar() {
                                 <span className="nav-text">Wallets</span>
                             </Link>
                         </li>
-                        <li className={pathname == "/budgets" ? "active" : ""}>
+                        {/* <li className={pathname == "/budgets" ? "active" : ""}>
                             <Link href="/budgets">
                                 <span>
                                     <i className="fi fi-rr-donate" />
@@ -41,7 +41,7 @@ export default function Sidebar() {
                                 </span>
                                 <span className="nav-text">Goals</span>
                             </Link>
-                        </li>
+                        </li> */}
                         <li className={pathname == "/profile" ? "active" : ""}>
                             <Link href="/profile">
                                 <span>
@@ -50,7 +50,7 @@ export default function Sidebar() {
                                 <span className="nav-text">Profile</span>
                             </Link>
                         </li>
-                        <li className={pathname == "/analytics" ? "active" : ""}>
+                        {/* <li className={pathname == "/analytics" ? "active" : ""}>
                             <Link href="/analytics">
                                 <span>
                                     <i className="fi fi-rr-chart-histogram" />
@@ -81,7 +81,7 @@ export default function Sidebar() {
                                 </span>
                                 <span className="nav-text">Settings</span>
                             </Link>
-                        </li>
+                        </li> */}
                     </ul>
                 </div>
             </div>

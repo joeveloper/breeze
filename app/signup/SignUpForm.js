@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useSignUp } from "@/contexts/SignUpContext";
+import Loading from "../loading";
 import Link from "next/link";
 
 const SignUpForm = () => {
@@ -27,6 +28,7 @@ const SignUpForm = () => {
 
   return (
     <div className="auth-form">
+      {isLoading && <Loading />}
       <h4>Sign Up</h4>
       <form onSubmit={handleSignUp}>
         <div className="col-12 mb-3">
@@ -61,26 +63,42 @@ const SignUpForm = () => {
           </div>
         </div>
         <div className="row">
-          <div className="col-12 mb-3">
-            <label className="form-label">First Name</label>
-            <input
-              name="firstName"
-              type="text"
-              className="form-control"
-              value={formData?.firstName}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="col-12 mb-3">
-            <label className="form-label">Last Name</label>
-            <input
-              name="lastName"
-              type="text"
-              className="form-control"
-              value={formData?.lastName}
-              onChange={handleInputChange}
-            />
-          </div>
+          {!vendor && (
+            <div className="col-12 mb-3">
+              <label className="form-label">First Name</label>
+              <input
+                name="firstName"
+                type="text"
+                className="form-control"
+                value={formData?.firstName}
+                onChange={handleInputChange}
+              />
+            </div>
+          )}
+          {!vendor && (
+            <div className="col-12 mb-3">
+              <label className="form-label">Last Name</label>
+              <input
+                name="lastName"
+                type="text"
+                className="form-control"
+                value={formData?.lastName}
+                onChange={handleInputChange}
+              />
+            </div>
+          )}
+          {vendor && (
+            <div className="col-12 mb-3">
+              <label className="form-label">RC Number</label>
+              <input
+                name="rcNumber"
+                type="text"
+                className="form-control"
+                value={formData?.rcNumber}
+                onChange={handleInputChange}
+              />
+            </div>
+          )}
           <div className="col-12 mb-3">
             <label className="form-label">Phone Number</label>
             <input
@@ -91,17 +109,19 @@ const SignUpForm = () => {
               onChange={handleInputChange}
             />
           </div>
-          <div className="col-12 mb-3">
-            <label className="form-label">Country</label>
-            <input
-              name="country"
-              type="text"
-              className="form-control"
-              value={formData?.country}
-              onChange={handleInputChange}
-            />
-          </div>
-          {vendor === false && (
+          {!vendor && (
+            <div className="col-12 mb-3">
+              <label className="form-label">Country</label>
+              <input
+                name="country"
+                type="text"
+                className="form-control"
+                value={formData?.country}
+                onChange={handleInputChange}
+              />
+            </div>
+          )}
+          {!vendor && (
             <div className="col-12 mb-3">
               <label className="form-label">
                 National Identification Number
@@ -115,7 +135,7 @@ const SignUpForm = () => {
               />
             </div>
           )}
-          {vendor ? (
+          {/* {vendor ? (
             <>
               <div className="col-12 mb-3">
                 <label className="form-label">Business Name</label>
@@ -148,17 +168,19 @@ const SignUpForm = () => {
                 />
               </div>
             </>
-          ) : null}
-          <div className="col-12 mb-3">
-            <label className="form-label">Email</label>
-            <input
-              name="email"
-              type="email"
-              className="form-control"
-              value={formData?.email}
-              onChange={handleInputChange}
-            />
-          </div>
+          ) : null} */}
+          {!vendor && (
+            <div className="col-12 mb-3">
+              <label className="form-label">Email</label>
+              <input
+                name="email"
+                type="email"
+                className="form-control"
+                value={formData?.email}
+                onChange={handleInputChange}
+              />
+            </div>
+          )}
           <div className="col-12 mb-3">
             <label className="form-label">Password</label>
             <input
@@ -169,27 +191,6 @@ const SignUpForm = () => {
               onChange={handleInputChange}
             />
           </div>
-          {/* <div className="col-12">
-            <div className="form-check">
-              <input
-                name="acceptTerms"
-                type="checkbox"
-                className="form-check-input"
-                id="acceptTerms"
-              />
-              <label className="form-check-label" htmlFor="acceptTerms">
-                I certify that I am 18 years of age or older, and agree to the{" "}
-                <Link href="#" className="text-primary">
-                  User Agreement
-                </Link>{" "}
-                and{" "}
-                <Link href="#" className="text-primary">
-                  Privacy Policy
-                </Link>
-                .
-              </label>
-            </div>
-          </div> */}
         </div>
         {error && <p className="text-danger">{error}</p>}
 

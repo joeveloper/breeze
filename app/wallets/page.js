@@ -33,6 +33,11 @@ export default function Wallets() {
       await fetchUserDetails();
 
       await fetchUserTransactions();
+
+      const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+      if (storedUser?.account?.interactableType === "USER") {
+        await checkPinStatus();
+      }
     };
     fetchData();
   }, []);
@@ -42,7 +47,7 @@ export default function Wallets() {
     const type =
       storedUser?.account?.interactableType === "USER"
         ? "user/auth/user-detail"
-        : "vendor/auth/vendor-detail";
+        : `vendor/auth/vendor-detail?routableNumber=${storedUser?.account?.routable?.routableNumber}`;
     try {
       // setLoading(true);
       const response = await fetch(`${baseurl}/${type}`, {
@@ -73,143 +78,60 @@ export default function Wallets() {
     }
   }, [user]);
 
-  // const fetchUserTransactions = useCallback(async () => {
-  //   const storedUser = JSON.parse(localStorage.getItem("currentUser"));
-  //   const userId = storedUser?.id || user?.id;
-  //   const routableNumber =
-  //     storedUser?.account.routable?.routableNumber || user?.routableNumber;
-  //   const type =
-  //     storedUser?.account?.interactableType === "USER"
-  //       ? "user?userId"
-  //       : "vendor?vendorId";
-  //   try {
-  //     setLoading(true);
-  //     const response = await fetch(
-  //       `${baseurl}/transactions/${type}=${userId}&routableNumber=${routableNumber}&page=1&limit=10`,
-  //       {
-  //         method: "GET",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-  //         },
-  //       }
-  //     );
+  const fetchUserTransactions = useCallback(
+    async (pageNum) => {
+      pageNum = page || 1;
+      const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+      const userId = storedUser?.id || user?.id;
+      const type =
+        storedUser?.account?.interactableType === "USER"
+          ? "user?userId"
+          : "vendor?vendorId";
+      const routableNumber =
+        storedUser?.account.routable?.routableNumber || user?.routableNumber;
 
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       console.log("tx", data.data);
-  //       setTransactionsList(data.data);
-  //     } else {
-  //       const errorData = await response.json();
-  //       throw new Error(
-  //         errorData.message || "An error occurred. Please try again."
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error("An error occurred:", error.message);
-  //     setError(error.message); // Save error message to display
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, [user]);
+      try {
+        setLoading(true);
 
-  // const fetchUserTransactions = useCallback(
-  //   async (page = 1) => {
-  //     const storedUser = JSON.parse(localStorage.getItem("currentUser"));
-  //     const userId = storedUser?.id || user?.id;
-  //     const routableNumber =
-  //       storedUser?.account.routable?.routableNumber || user?.routableNumber;
-  //     const type =
-  //       storedUser?.account?.interactableType === "USER"
-  //         ? "user?userId"
-  //         : "vendor?vendorId";
-
-  //     try {
-  //       setLoading(true);
-  //       const response = await fetch(
-  //         `${baseurl}/transactions/${type}=${userId}&routableNumber=${routableNumber}&page=${page}&limit=10`,
-  //         {
-  //           method: "GET",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-  //           },
-  //         }
-  //       );
-
-  //       if (response.ok) {
-  //         const data = await response.json();
-  //         setTransactionsList((prevTransactions) => [
-  //           ...prevTransactions,
-  //           ...data.data, // Append the new data to existing data
-  //         ]);
-  //       } else {
-  //         const errorData = await response.json();
-  //         throw new Error(
-  //           errorData.message || "An error occurred. Please try again."
-  //         );
-  //       }
-  //     } catch (error) {
-  //       console.error("An error occurred:", error.message);
-  //       setError(error.message); // Save error message to display
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   },
-  //   [user]
-  // );
-
-  const fetchUserTransactions = useCallback(async (pageNum) => {
-    pageNum = page || 1;
-    const storedUser = JSON.parse(localStorage.getItem("currentUser"));
-    const userId = storedUser?.id || user?.id;
-    const routableNumber =
-      storedUser?.account.routable?.routableNumber || user?.routableNumber;
-    const type =
-      storedUser?.account?.interactableType === "USER"
-        ? "user?userId"
-        : "vendor?vendorId";
-
-    try {
-      setLoading(true);
-
-      // Modify the URL to fetch the correct data
-      const response = await fetch(
-        `${baseurl}/transactions/${type}=${userId}&routableNumber=${routableNumber}&page=${pageNum}&limit=10`, // Use `page` for pagination
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("tx", data.data);
-
-        // Ensure that `data.data` is an array before appending
-        if (data && data?.data) {
-          setCount(data?.data?.meta?.totalCount);
-          setTransactionsList((prevTransactions) => [
-            ...prevTransactions, // Append new transactions to the previous list
-            ...data?.data?.transactions, // Add the new transactions fetched from API
-          ]);
-        }
-      } else {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || "An error occurred. Please try again."
+        // Modify the URL to fetch the correct data
+        const response = await fetch(
+          `${baseurl}/transactions/${type}=${userId}&routableNumber=${routableNumber}&page=${pageNum}&limit=10`, // Use `page` for pagination
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("tx", data.data);
+
+          // Ensure that `data.data` is an array before appending
+          if (data && data?.data) {
+            setCount(data?.data?.meta?.totalCount);
+            setTransactionsList((prevTransactions) => [
+              ...prevTransactions, // Append new transactions to the previous list
+              ...data?.data?.transactions, // Add the new transactions fetched from API
+            ]);
+          }
+        } else {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message || "An error occurred. Please try again."
+          );
+        }
+      } catch (error) {
+        console.error("An error occurred:", error.message);
+        setError(error.message); // Save error message to display
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("An error occurred:", error.message);
-      setError(error.message); // Save error message to display
-    } finally {
-      setLoading(false);
-    }
-  }, [user, page]); // Add `page` as a dependency to re-fetch when page changes
+    },
+    [user, page]
+  ); // Add `page` as a dependency to re-fetch when page changes
 
   const handleScroll = (event) => {
     const bottom =
@@ -227,18 +149,23 @@ export default function Wallets() {
 
   const checkPinStatus = async () => {
     try {
+      const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+      const routableNumber = storedUser?.account?.routable?.routableNumber;
       setLoading(true);
-      const response = await fetch(`${baseurl}/user/auth/pin-status`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+      const response = await fetch(
+        `${baseurl}/auth/pin-status?routableNumber=${routableNumber}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data.data);
+        console.log("pin status:", data.data);
         setPinStatus(true);
       } else {
         const errorData = await response.json();
@@ -265,18 +192,16 @@ export default function Wallets() {
       <Layout breadcrumbTitle="Wallets">
         {loading && <Loading />}
 
-        {user &&
-          user?.account?.interactableType === "USER" &&
-          !pinStatus && (
-            <ToastDisplay
-              message={
-                <span>
-                  <Link href="/create-pin">Click here to create a pin.</Link>
-                </span>
-              }
-              type="warning"
-            />
-          )}
+        {user && user?.account?.interactableType === "USER" && !pinStatus && (
+          <ToastDisplay
+            message={
+              <span>
+                <Link href="/create-pin">Click here to create a pin.</Link>
+              </span>
+            }
+            type="warning"
+          />
+        )}
         <div className="wallet-tab">
           <div className="row g-0">
             <div className="col-xl-3">

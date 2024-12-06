@@ -9,7 +9,6 @@ const SignInForm = () => {
   const { signIn, isLoading, error } = useAuth();
   const [errorMessage, setErrorMessage] = useState(null);
   const [credentials, setCredentials] = useState({ email: "", password: "" });
-  // const [type, setType] = useState(null);
 
   const handleInputChange = (e) => {
     e.preventDefault();
@@ -91,7 +90,7 @@ const SignInForm = () => {
       </form>
       <p className="mt-3 mb-0 undefined">
         Don't have an account?
-        <Link className="text-primary" href="/signup">
+        <Link className="text-primary" href="/register-phone">
           {" "}
           Sign up
         </Link>

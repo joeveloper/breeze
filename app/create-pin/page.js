@@ -5,6 +5,7 @@ import Layout from "@/components/layout/Layout";
 import { useRouter } from "next/navigation";
 import ToastDisplay from "../../components/elements/ToastDisplay";
 import Loading from "../loading";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function AddBank() {
   const [pinData, setPinData] = useState(Array(4).fill(""));
@@ -12,6 +13,7 @@ export default function AddBank() {
   const [loading, setLoading] = useState(false);
   const inputRefs = useRef([]);
   const router = useRouter();
+  const { getCurrentUser } = useAuth();
 
   const styles = {
     height: "50px",
@@ -45,20 +47,40 @@ export default function AddBank() {
     e.preventDefault(); // Disable paste
   };
 
+  const createTransactionPin = async () => {
+    try {
+      setLoading(true);
+      const pinCode = pinData?.join("");
+
+      const response = await fetch(`${baseUrl}/auth/create-pin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body: JSON.stringify({
+          pin: pinCode,
+          routableNumber: getCurrentUser?.account?.routable?.routableNumber,
+        }),
+      });
+
+      if (!response.ok) {
+        // Attempt to parse the error message from the response
+        const errorData = await response.json();
+        throw new Error(errorData.message || "An unknown error occurred!");
+      }
+
+      const data = await response.json();
+      setVendor(data?.data);
+      router.push(`/wallets`);
+    } catch (error) {}
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Combine the PIN code
-    const pinCode = pinData.join("");
+    createTransactionPin();
 
-    if (pinCode.length !== 4) {
-      setError("Please enter a valid 4-digit PIN code.");
-      return;
-    }
-
-    console.log("Entered PIN:", pinCode);
-
-    // Perform further actions (e.g., submit PIN to the server)
   };
 
   return (
@@ -74,7 +96,7 @@ export default function AddBank() {
                     <h4 className="card-title">Create 4-digit Pin</h4>
                   </div>
                   <div className="card-body">
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={(e)=>handleSubmit(e)}>
                       <div
                         className="d-flex justify-content-center align-items-center"
                         style={{ gap: "10px", margin: "20px 0" }}
@@ -109,6 +131,7 @@ export default function AddBank() {
                             fontWeight: "bold",
                             borderRadius: "5px",
                           }}
+                          disabled={loading || !pinData.every((value) => value)}
                         >
                           Submit
                         </button>

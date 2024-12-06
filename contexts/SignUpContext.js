@@ -2,10 +2,12 @@
 
 import React, { createContext, useState, useContext } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "./AuthContext";
 
 const SignUpContext = createContext();
 
 export const SignUpProvider = ({ children }) => {
+  const {setAuth} = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
@@ -16,11 +18,6 @@ export const SignUpProvider = ({ children }) => {
   const [userType, setUserType] = useState(null);
 
   const baseUrl = "https://aermint.onrender.com/api/v1";
-
-  // const userTypes = {
-  //   regularUser: "regularUser",
-  //   vendorUser: "vendorUser",
-  // };
 
   const handleInputChange = (e) => {
     e.preventDefault();
@@ -46,9 +43,7 @@ export const SignUpProvider = ({ children }) => {
         phoneNumber,
         country,
         nationalIdentificationNo,
-        businessName, // Vendor-specific field
-        businessAddress, // Vendor-specific field
-        businessType, // Vendor-specific field
+        rcNumber,
       } = formData;
 
       console.log("Signup form data:", formData);
@@ -76,24 +71,19 @@ export const SignUpProvider = ({ children }) => {
           nationalIdentificationNo,
         };
       } else if (userType === "vendorUser") {
-        if (!businessName || !businessAddress || !businessType) {
-          throw new Error(
-            "Please fill out all required fields for vendor registration."
-          );
-        }
+        // if (!businessName || !businessAddress || !businessType) {
+        //   throw new Error(
+        //     "Please fill out all required fields for vendor registration."
+        //   );
+        // }
         payload = {
-          email,
           password,
-          firstName,
-          lastName,
           phoneNumber,
-          country,
-          // nationalIdentificationNo,
-          businessName,
-          businessAddress,
-          businessType,
+          rcNumber,
         };
       }
+
+      console.log("Signup payload:", payload);
 
       // Make the API request
       const response = await fetch(`${baseUrl}/${url}`, {
@@ -112,9 +102,13 @@ export const SignUpProvider = ({ children }) => {
 
       const data = await response.json();
       console.log("Signup successful:", data);
+      console.log(data);
+      localStorage.setItem("accessToken", data.data.token);
+      setAuth(true, data.data);
+      router.push("/wallets");
 
       // Navigate to OTP page
-      router.push(`/otp-code?userType=${userType}`);
+      router.push(`/wallets`);
       alert(`Signup successful: Welcome, ${data.firstName || "User"}!`);
     } catch (err) {
       console.error("Signup error:", err.message);
